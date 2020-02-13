@@ -6,7 +6,7 @@ const server = express();
 
 server.post("/api/users", (req, res) => {
   const newUser = {
-    id: users.length + 1,
+    id: db.insert(user),
     name: req.body.name,
     bio: req.body.bio
   };
