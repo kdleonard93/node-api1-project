@@ -13,22 +13,28 @@ server.get("/api/users", (req, res) => {
     .catch(data => res.status(500).json({ message: "User not found." }));
 });
 
-server.get("/api/users/:id", (req, res) => {
-  const { id } = req.params;
-});
+server
+  .get("/api/users/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.findById(id).then(data => {
+      if (data) {
+        return res.json(data);
+      }
+      res
+        .status(404)
+        .json({ message: "User with specified ID does not exist." });
+    });
+  })
+  .catch(data => res.status(500).json({ message: "User not found." }));
 
 server.post("/api/users", (req, res) => {
-  const newUser = {
-    // id: db.insert(user),
-    name: req.body.name,
-    bio: req.body.bio
-  };
-  // users.push(newUser);
-  db.insert(newUser);
-  res.status(201).json({ message: "User not found" });
-  // if (users !== name || bio) {
-  //   return res.status(400).json({ message: "Bad Request" });
-  // }
+  const { name, bio } = req.body;
+  if (!name || !bio) {
+    return res
+      .status(500)
+      .json({ message: "Please provide name and bio for user." });
+  }
 });
 
 server.listen(port, () => {
