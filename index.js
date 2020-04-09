@@ -4,14 +4,6 @@ const db = require("./data/db");
 
 const server = express();
 
-server.post("/api/users", (req, res) => {
-  const id = req.params.id;
-  const newUser = {
-    name: req.body.name,
-    bio: req.body.bio,
-  };
-});
-
 server.get("/api/users/:id", (req, res) => {
   const { id } = req.params;
 
@@ -42,4 +34,50 @@ server.post("/api/users", (req, res) => {
         .status(500)
         .json({ message: "There is an error with saving the user." })
     );
+});
+server.put("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, bio } = req.body;
+  if (!name || !bio) {
+    return res
+      .status(500)
+      .json({ message: "Please provide name and bio for user." });
+  }
+
+  db.findById(id).then((user) => {
+    if (user) {
+      return db.update(id, { name, bio });
+    }
+    res.status(404).json({ message: "User with specified ID does not exist" });
+  });
+  db.insert({ name, bio })
+    .then(() => db.findById(id))
+    .then((data) => res.json(data))
+    .catch((error) =>
+      res
+        .status(500)
+        .json({ message: "The user information could not be modified." })
+    );
+});
+
+server.delete("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  db.findById(id)
+    .then((user) => {
+      if (user) {
+        return db.remove(id);
+      }
+      res
+        .status(404)
+        .json({ message: "User with Specified ID does not exist." });
+    })
+    .then(() => res.status(204).end())
+    .catch((error) =>
+      res.status(500).json({ message: "User could not be removed" })
+    );
+});
+
+server.listen(port, () => {
+  console.log(`server started at http://localhost${port}`);
 });
