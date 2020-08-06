@@ -10,6 +10,7 @@ module.exports = {
   remove,
 };
 
+
 function find() {
   return db('users');
 }
@@ -37,3 +38,5 @@ function remove(id) {
     .where('id', Number(id))
     .del();
 }
+
+
