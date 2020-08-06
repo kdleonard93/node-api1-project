@@ -20,10 +20,14 @@ server.get("/api/users", (req, res) => {
 server.get("/api/users/:id", (req, res) =>{
 const id = req.params.id;
 const user = getUserById(id);
-if(user) {
-  res.json(user)
-} else {
-  res.status(404).json({message: "The user with the specified ID does not exist."})
+try{
+  if(user) {
+    res.json(user)
+  } else {
+    res.status(404).json({message: "The user with the specified ID does not exist."})
+  }
+} catch(error){
+  res.status(500).json({errorMessage: "The user information could not be retrieved."})
 }
 });
 
@@ -32,12 +36,18 @@ server.post("/api/users", (req, res) => {
     name:req.body.name,
     bio: req.body.bio
   });
-  if(!req.body.name || !req.body.bio) {
-    res.status(400).json({errorMessage: "Please provide name and bio for the user."})
-  } else {
-    res.status(201).json(newUser);
+  try{
+    if(!req.body.name || !req.body.bio) {
+      res.status(400).json({errorMessage: "Please provide name and bio for the user."})
+    } else {
+      res.status(201).json(newUser);
+    }
+  } catch(error) {
+    res.status(500).json({errorMessage: "There was an error while saving the user to the database"})
   }
 });
+
+
 
 server.listen(port, () => {
   console.log(`Server is running on ${port}`);
