@@ -1,42 +1,45 @@
-const knex = require('knex');
-const knexConfig = require('../knexfile.js');
-const db = knex(knexConfig.development);
+let users = [
+	{ id: "1", name: "Kyle Leo" },
+	{ id: "2", name: "Leo Kyle" },
+	{ id: "3", name: "Oreo Ringo" },
+]
+
+function getUsers() {
+	return users
+}
+
+function getUserById(id) {
+	return users.find(u => u.id === id)
+}
+
+function createUser(data) {
+	const payload = {
+		id: String(users.length + 1),
+		...data,
+	}
+
+	users.push(payload)
+	return payload
+}
+
+function updateUser(id, data) {
+	const index = users.findIndex(u => u.id === id)
+	users[index] = {
+		...users[index],
+		...data,
+	}
+	
+	return users[index]
+}
+
+function deleteUser(id) {
+	users = users.filter(u => u.id != id)
+}
 
 module.exports = {
-  find,
-  findById,
-  insert,
-  update,
-  remove,
-};
-
-
-function find() {
-  return db('users');
+	getUsers,
+	getUserById,
+	createUser,
+	updateUser,
+	deleteUser,
 }
-
-function findById(id) {
-  return db('users')
-    .where({ id: Number(id) })
-    .first();
-}
-
-function insert(user) {
-  return db('users')
-    .insert(user)
-    .then(ids => ({ id: ids[0] }));
-}
-
-function update(id, user) {
-  return db('users')
-    .where('id', Number(id))
-    .update(user);
-}
-
-function remove(id) {
-  return db('users')
-    .where('id', Number(id))
-    .del();
-}
-
-
