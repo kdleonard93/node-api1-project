@@ -47,7 +47,37 @@ server.post("/api/users", (req, res) => {
   }
 });
 
+server.put("/api/users/:id", (req, res) => {
+  const updatedUser = db.updateUser({
+    name:req.body.name,
+    bio: req.body.bio
+  });
+  try{
+    if(!req.body.name || !req.body.bio) {
+      res.status(400).json({message: "Please provide name and bio for the user."})
+    } else if (!user) {
+      res.status(404).json({message: "The user with the specified ID does not exist."})
+  } else {
+      res.status(201).json(updatedUser);
+    }
+  } catch(error) {
+    res.status(500).json({errorMessage: "There was an error while saving the user to the database"})
+  }
+});
 
+server.delete("/api/users/:id", (req, res) => {
+  const user = getUserById(req.params.id);
+  try{
+      if (user) {
+          db.deleteUser(req.params.id)
+          res.status(204).json({ message: "User deleted." })
+      } else {
+          res.status(404).json({ message: "The user with the specified ID does not exist." })
+      }
+  } catch(error) {
+      res.status(500).json({ errorMessage: "The user could not be removed." })
+  }
+});
 
 server.listen(port, () => {
   console.log(`Server is running on ${port}`);
